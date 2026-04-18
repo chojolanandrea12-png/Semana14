@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🎲 Estadística Lúdica: Binomial & Poisson | Juegos Matemáticos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none; /* Evita selección molesta en clics rápidos */
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #0a0f2c 0%, #0b1525 100%);
+            font-family: 'Poppins', 'Segoe UI', 'Montserrat', system-ui, -apple-system, 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+        }
+
+        /* contenedor principal con efecto neón */
+        .game-container {
+            max-width: 1300px;
+            width: 100%;
+            background: rgba(10, 20, 35, 0.65);
+            backdrop-filter: blur(2px);
+            border-radius: 3.5rem;
+            padding: 1.8rem;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            transition: all 0.2s;
+        }
+
+        /* encabezado creativo */
+        .hero {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .hero h1 {
+            font-size: 2.6rem;
+            background: linear-gradient(135deg, #F9F3C1, #FFD966, #6AD4FF);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .hero p {
+            color: #b7e1ff;
+            font-weight: 500;
+            margin-top: 8px;
+            font-size: 1.1rem;
+            background: rgba(0, 0, 0, 0.4);
+            display: inline-block;
+            padding: 5px 18px;
+            border-radius: 60px;
+            backdrop-filter: blur(4px);
+        }
+
+        /* layout de dos columnas (juegos) */
+        .games-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+        }
+
+        .card {
+            flex: 1;
+            min-width: 280px;
+            background: rgba(15, 25, 45, 0.75);
+            backdrop-filter: blur(12px);
+            border-radius: 2.5rem;
+            padding: 1.6rem 1.8rem;
+            transition: transform 0.25s ease, box-shadow 0.3s;
+            border: 1px solid rgba(80, 180, 255, 0.4);
+            box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.4);
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: #4c9eff;
+            box-shadow: 0 25px 35px -12px #001d3d;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.3rem;
+            border-bottom: 2px dashed #2f6eb3;
+            padding-bottom: 12px;
+        }
+        .card-header h2 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: #FFE5A3;
+        }
+        .badge {
+            background: #0b2b44;
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #9bd4ff;
+        }
+
+        /* área de pregunta y juego */
+        .question-area {
+            background: #07121fcc;
+            border-radius: 2rem;
+            padding: 1.4rem;
+            margin: 1rem 0;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            font-weight: bold;
+            background: #00000055;
+            padding: 10px 15px;
+            border-radius: 40px;
+        }
+        .score {
+            color: #D6FF79;
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+        }
+        .question-text {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: white;
+            background: #0a1b2ed9;
+            padding: 15px;
+            border-radius: 1.8rem;
+            margin: 15px 0;
+            text-align: center;
+            line-height: 1.4;
+            box-shadow: inset 0 1px 3px #00000033, 0 5px 10px rgba(0,0,0,0.2);
+        }
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+        .opt-btn {
+            background: linear-gradient(145deg, #1f3a5f, #0f233b);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 60px;
+            font-weight: bold;
+            font-size: 1rem;
+            color: #f0f9ff;
+            cursor: pointer;
+            transition: 0.1s linear;
+            flex: 1 0 auto;
+            min-width: 110px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            font-family: monospace;
+            letter-spacing: 0.5px;
+        }
+        .opt-btn:hover:not(:disabled) {
+            background: linear-gradient(145deg, #2f5282, #1a314f);
+            transform: scale(0.97);
+            box-shadow: 0 2px 4px black;
+        }
+        .opt-btn.correct-glow {
+            background: #3bac6f;
+            box-shadow: 0 0 12px #44ffaa;
+            color: white;
+        }
+        .opt-btn.wrong-glow {
+            background: #b13e3e;
+            box-shadow: 0 0 10px #ff7b7b;
+            text-decoration: line-through;
+        }
+        .feedback {
+            font-size: 0.95rem;
+            margin: 12px 0;
+            padding: 8px;
+            border-radius: 28px;
+            text-align: center;
+            background: #00000066;
+            font-weight: 500;
+        }
+        .next-btn {
+            background: #ffb347;
+            background: linear-gradient(95deg, #ff9f2e, #ffc857);
+            border: none;
+            padding: 12px 18px;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #1e2a3a;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.15s;
+            margin-top: 10px;
+            font-family: inherit;
+        }
+        .next-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .reset-btn {
+            background: #2c3e66;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+        .footer-note {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.8rem;
+            color: #8fbbf0;
+        }
+        button:active {
+            transform: scale(0.96);
+        }
+        @media (max-width: 780px) {
+            .card-header h2 { font-size: 1.5rem; }
+            .question-text { font-size: 1.1rem; }
+            .opt-btn { padding: 8px 12px; font-size: 0.9rem; }
+        }
+        .rainbow-text {
+            animation: pulse 1.8s infinite;
+        }
+        @keyframes pulse {
+            0% { text-shadow: 0 0 2px cyan; }
+            100% { text-shadow: 0 0 8px magenta; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-container">
+    <div class="hero">
+        <h1>
+            🎲 DISTRIBUCIÓN PROBABILÍSTICA 🧠
+            <span style="font-size: 2rem;">⚡</span>
+        </h1>
+        <p>🎯 Juega, aprende y domina Binomial & Poisson | ¡Puntúa y reta a tus amigos!</p>
+    </div>
+
+    <div class="games-row">
+        <!-- JUEGO BINOMIAL -->
+        <div class="card" id="binomialCard">
+            <div class="card-header">
+                <h2>📊 Binomial</h2>
+                <div class="badge">n ensayos • probabilidad fija</div>
+            </div>
+            <div class="question-area" id="binomialGame">
+                <div class="stats">
+                    <span>🎯 Aciertos: <span id="binomialScore">0</span></span>
+                    <span>❓ Pregunta: <span id="binomialQNumber">1</span>/<span id="binomialTotal">5</span></span>
+                    <button class="reset-btn" id="resetBinomialBtn">🔄 Reiniciar</button>
+                </div>
+                <div class="question-text" id="binomialQuestion">
+                    Cargando pregunta...
+                </div>
+                <div class="options" id="binomialOptions"></div>
+                <div class="feedback" id="binomialFeedback">✨ Elige una opción para responder</div>
+                <button class="next-btn" id="binomialNextBtn" disabled>➡️ Siguiente pregunta</button>
+            </div>
+        </div>
+
+        <!-- JUEGO POISSON -->
+        <div class="card" id="poissonCard">
+            <div class="card-header">
+                <h2>☄️ Poisson</h2>
+                <div class="badge">eventos en intervalo • λ</div>
+            </div>
+            <div class="question-area" id="poissonGame">
+                <div class="stats">
+                    <span>🏆 Puntos: <span id="poissonScore">0</span></span>
+                    <span>📋 Pregunta: <span id="poissonQNumber">1</span>/<span id="poissonTotal">5</span></span>
+                    <button class="reset-btn" id="resetPoissonBtn">🔄 Reiniciar</button>
+                </div>
+                <div class="question-text" id="poissonQuestion">
+                    Cargando pregunta...
+                </div>
+                <div class="options" id="poissonOptions"></div>
+                <div class="feedback" id="poissonFeedback">💡 Selecciona la probabilidad correcta</div>
+                <button class="next-btn" id="poissonNextBtn" disabled>✨ Siguiente pregunta</button>
+            </div>
+        </div>
+    </div>
+    <div class="footer-note">
+        ⚡ Juega y aprende: cada acierto suma 10 puntos. ¡Completa las 5 rondas y celebra tu dominio estadístico!
+    </div>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    //  BASE DE DATOS DE PREGUNTAS: DISTRIBUCIÓN BINOMIAL
+    // --------------------------------------------------------------
+    const binomialQuestions = [
+        {
+            text: "📌 Lanzas una moneda justa 8 veces. ¿Cuál es la probabilidad de obtener exactamente 3 caras? (Binomial: n=8, p=0.5, k=3)",
+            options: ["0.21875", "0.27344", "0.3125", "0.21875"],
+            correct: "0.21875",
+            explanation: "✅ Correcto! C(8,3)*(0.5)^8 = 56/256 = 0.21875"
+        },
+        {
+            text: "🎲 Un dado justo se lanza 5 veces. Probabilidad de obtener exactamente 2 veces el número 4. (p=1/6≈0.1667)",
+            options: ["0.1608", "0.2000", "0.1152", "0.1800"],
+            correct: "0.1608",
+            explanation: "✨ Binomial: C(5,2)*(1/6)^2*(5/6)^3 ≈ 10*0.02778*0.5787 ≈ 0.1608"
+        },
+        {
+            text: "🏀 Un jugador anota el 70% de sus tiros libres. Si lanza 4 tiros, ¿probabilidad de anotar exactamente 3?",
+            options: ["0.4116", "0.3430", "0.2646", "0.3087"],
+            correct: "0.4116",
+            explanation: "🏆 Binomial: C(4,3)*(0.7)^3*(0.3) = 4*0.343*0.3 = 0.4116"
+        },
+        {
+            text: "🔬 La probabilidad de que un componente sea defectuoso es 0.05. Si se toman 10 componentes, ¿probabilidad de que exactamente 1 sea defectuoso?",
+            options: ["0.3151", "0.3774", "0.2834", "0.3980"],
+            correct: "0.3151",
+            explanation: "🧪 Binomial: C(10,1)*(0.05)*(0.95)^9 ≈ 10*0.05*0.6302 ≈ 0.3151"
+        },
+        {
+            text: "🎯 En un test de opción múltiple con 6 preguntas (cada una con 4 opciones), adivinando al azar, ¿probabilidad de acertar exactamente 2? (p=0.25)",
+            options: ["0.2966", "0.3245", "0.2670", "0.1318"],
+            correct: "0.2966",
+            explanation: "📚 Binomial: C(6,2)*(0.25)^2*(0.75)^4 = 15*0.0625*0.3164 ≈ 0.2966"
+        }
+    ];
+
+    // --------------------------------------------------------------
+    //  BASE DE DATOS: DISTRIBUCIÓN DE POISSON
+    // --------------------------------------------------------------
+    const poissonQuestions = [
+        {
+            text: "📞 Un call center recibe en promedio 3 llamadas por minuto (λ=3). ¿Probabilidad de recibir exactamente 2 llamadas en un minuto? (e⁻³≈0.049787)",
+            options: ["0.2240", "0.1494", "0.1804", "0.2240"],
+            correct: "0.2240",
+            explanation: "📞 Poisson: P(X=2)= (e⁻³ * 3²)/2! = 0.049787*9/2 ≈ 0.2240"
+        },
+        {
+            text: "🚗 Accidentes mensuales en una intersección: promedio λ=2. Probabilidad de que ocurran exactamente 4 accidentes en un mes.",
+            options: ["0.0902", "0.1353", "0.1804", "0.1120"],
+            correct: "0.0902",
+            explanation: "🚦 P(X=4)= (e⁻² * 2⁴)/24 = (0.1353*16)/24 ≈ 0.0902"
+        },
+        {
+            text: "🖨️ Una impresora falla en promedio 1.5 veces por semana (λ=1.5). Probabilidad de que falle exactamente 3 veces en una semana.",
+            options: ["0.1255", "0.2510", "0.2100", "0.1680"],
+            correct: "0.1255",
+            explanation: "📠 Poisson: (e⁻¹·⁵ * 1.5³)/6 = (0.22313*3.375)/6 ≈ 0.1255"
+        },
+        {
+            text: "⭐ Estrellas fugaces por hora: promedio λ=5. Probabilidad de observar exactamente 7 en una hora.",
+            options: ["0.1044", "0.1462", "0.0821", "0.1044"],
+            correct: "0.1044",
+            explanation: "🌠 P(X=7)= e⁻⁵*5⁷/5040 = 0.0067379*78125/5040 ≈ 0.1044"
+        },
+        {
+            text: "📧 Un servidor recibe λ=4 correos por minuto. Probabilidad de recibir exactamente 6 correos en un minuto.",
+            options: ["0.1042", "0.1221", "0.1562", "0.0892"],
+            correct: "0.1042",
+            explanation: "📨 Poisson: e⁻⁴ * 4⁶/720 = 0.018316*4096/720 ≈ 0.1042"
+        }
+    ];
+
+    // ---------- CLASE GENÉRICA PARA MANEJAR CADA JUEGO ----------
+    class ProbabilityGame {
+        constructor(questionsArray, scoreSpanId, qNumberSpanId, totalSpanId, questionDivId, optionsContainerId, feedbackDivId, nextBtnId, resetBtnId) {
+            this.questions = [...questionsArray];
+            this.score = 0;
+            this.currentIndex = 0;        // pregunta actual (0-index)
+            this.answered = false;         // si ya respondió la pregunta actual
+            this.correctAnswerText = "";
+            
+            // Elementos DOM
+            this.scoreSpan = document.getElementById(scoreSpanId);
+            this.qNumberSpan = document.getElementById(qNumberSpanId);
+            this.totalSpan = document.getElementById(totalSpanId);
+            this.questionDiv = document.getElementById(questionDivId);
+            this.optionsContainer = document.getElementById(optionsContainerId);
+            this.feedbackDiv = document.getElementById(feedbackDivId);
+            this.nextBtn = document.getElementById(nextBtnId);
+            this.resetBtn = document.getElementById(resetBtnId);
+            
+            this.totalQuestions = this.questions.length;
+            if(this.totalSpan) this.totalSpan.innerText = this.totalQuestions;
+            
+            // Bind eventos
+            this.nextBtn.addEventListener('click', () => this.nextQuestion());
+            this.resetBtn.addEventListener('click', () => this.resetGame());
+            
+            // Inicializar
+            this.loadQuestion();
+        }
+        
+        loadQuestion() {
+            // Limpiar estado
+            this.answered = false;
+            this.nextBtn.disabled = true;
+            this.feedbackDiv.innerHTML = "🤔 ¿Cuál es la respuesta correcta?";
+            this.feedbackDiv.style.color = "#bbd9ff";
+            // habilitar botones de opción nuevamente (remover eventos viejos)
+            this.renderOptions();
+            // mostrar número de pregunta
+            if(this.qNumberSpan) this.qNumberSpan.innerText = this.currentIndex+1;
+            const qData = this.questions[this.currentIndex];
+            this.questionDiv.innerHTML = qData.text;
+            this.correctAnswerText = qData.correct;
+        }
+        
+        renderOptions() {
+            this.optionsContainer.innerHTML = '';
+            const currentQ = this.questions[this.currentIndex];
+            // mezclar opciones para dar dinamismo (pero mantener la correcta en algún lugar)
+            let opts = [...currentQ.options];
+            // eliminar duplicados exactos pero mantener orden aleatorio
+            opts = [...new Map(opts.map(opt => [opt, opt])).values()];
+            // mezclar aleatoriamente
+            for (let i = opts.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [opts[i], opts[j]] = [opts[j], opts[i]];
+            }
+            opts.forEach(optVal => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerText = optVal;
+                btn.addEventListener('click', () => this.checkAnswer(optVal, btn));
+                this.optionsContainer.appendChild(btn);
+            });
+        }
+        
+        checkAnswer(selected, btnElement) {
+            if (this.answered) {
+                this.feedbackDiv.innerHTML = "⚠️ Ya respondiste esta pregunta. Continúa con 'Siguiente'.";
+                return;
+            }
+            const isCorrect = (selected === this.correctAnswerText);
+            if (isCorrect) {
+                this.score += 10;
+                this.scoreSpan.innerText = this.score;
+                this.feedbackDiv.innerHTML = `🎉 ¡CORRECTO! +10 puntos. ${this.questions[this.currentIndex].explanation}`;
+                this.feedbackDiv.style.color = "#b3ffcf";
+                // aplicar estilo de acierto al botón
+                btnElement.classList.add('correct-glow');
+            } else {
+                this.feedbackDiv.innerHTML = `❌ Incorrecto. La respuesta correcta era: ${this.correctAnswerText}. ${this.questions[this.currentIndex].explanation}`;
+                this.feedbackDiv.style.color = "#ffbcbc";
+                btnElement.classList.add('wrong-glow');
+                // Resaltar opción correcta (para aprendizaje)
+                const allBtns = this.optionsContainer.querySelectorAll('.opt-btn');
+                allBtns.forEach(btn => {
+                    if(btn.innerText === this.correctAnswerText) {
+                        btn.classList.add('correct-glow');
+                    }
+                });
+            }
+            this.answered = true;
+            this.nextBtn.disabled = false;
+            // deshabilitar todos los botones para evitar múltiples respuestas
+            const allOptBtns = this.optionsContainer.querySelectorAll('.opt-btn');
+            allOptBtns.forEach(btn => btn.disabled = true);
+        }
+        
+        nextQuestion() {
+            if (!this.answered) {
+                this.feedbackDiv.innerHTML = "🔔 ¡Responde la pregunta actual antes de continuar!";
+                return;
+            }
+            if (this.currentIndex + 1 < this.totalQuestions) {
+                this.currentIndex++;
+                this.answered = false;
+                this.loadQuestion();
+            } else {
+                // FIN DEL JUEGO
+                this.feedbackDiv.innerHTML = `🏆 ¡JUEGO COMPLETADO! Puntuación final: ${this.score} / ${this.totalQuestions*10} 🏆. Presiona Reiniciar para jugar otra vez.`;
+                this.feedbackDiv.style.color = "#f9e45b";
+                this.nextBtn.disabled = true;
+                // deshabilitar todas las opciones restantes
+                const allOptBtns = this.optionsContainer.querySelectorAll('.opt-btn');
+                allOptBtns.forEach(btn => btn.disabled = true);
+                // Mostrar mensaje especial en el área de pregunta
+                this.questionDiv.innerHTML = "✨ ¡Excelente! Has dominado las preguntas. ✨<br> Usa 'Reiniciar' para un nuevo desafío.";
+                this.optionsContainer.innerHTML = '<div style="text-align:center; padding:10px;">🎉 🎲 🧠</div>';
+            }
+        }
+        
+        resetGame() {
+            this.score = 0;
+            this.currentIndex = 0;
+            this.answered = false;
+            this.scoreSpan.innerText = "0";
+            // Mezclar preguntas ligeramente? (Opcional: podemos mantener orden pero reiniciar)
+            // Para mayor frescura, barajamos las preguntas? Opcional divertido
+            this.shuffleQuestions();
+            this.loadQuestion();
+            this.feedbackDiv.innerHTML = "🔄 Juego reiniciado! Nuevas preguntas para practicar.";
+            this.feedbackDiv.style.color = "#d0eaff";
+            this.nextBtn.disabled = true;
+        }
+        
+        shuffleQuestions() {
+            // Mezcla las preguntas para que cada reinicio sea único
+            for (let i = this.questions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [this.questions[i], this.questions[j]] = [this.questions[j], this.questions[i]];
+            }
+            // actualizamos referencia
+            this.totalQuestions = this.questions.length;
+            if(this.totalSpan) this.totalSpan.innerText = this.totalQuestions;
+        }
+    }
+    
+    // Inicializar ambos juegos con sus respectivos IDs y arrays
+    const binomialGame = new ProbabilityGame(
+        binomialQuestions,
+        "binomialScore",
+        "binomialQNumber",
+        "binomialTotal",
+        "binomialQuestion",
+        "binomialOptions",
+        "binomialFeedback",
+        "binomialNextBtn",
+        "resetBinomialBtn"
+    );
+    
+    const poissonGame = new ProbabilityGame(
+        poissonQuestions,
+        "poissonScore",
+        "poissonQNumber",
+        "poissonTotal",
+        "poissonQuestion",
+        "poissonOptions",
+        "poissonFeedback",
+        "poissonNextBtn",
+        "resetPoissonBtn"
+    );
+    
+    // Ajuste adicional: Al reiniciar también refrescamos mezcla para más diversión.
+    // Sobreescribir shuffleQuestions original? ya funciona.
+    // extra: añadir efecto dinámico al pasar preguntas con sonido mental :D
+    
+    // Prevenir envío de teclas accidentales
+    document.querySelectorAll('.next-btn, .reset-btn, .opt-btn').forEach(btn => {
+        btn.addEventListener('keydown', (e) => e.stopPropagation());
+    });
+    
+    // Mensaje inicial creativo en consola
+    console.log("%c🎲 Juegos Estadísticos: Binomial y Poisson activos! ¡Acierta y gana puntos!", "color: #ffaa44; font-size: 14px;");
+</script>
+</body>
+</html>
